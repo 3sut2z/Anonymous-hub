@@ -1,118 +1,97 @@
-local player = game.Players.LocalPlayer
-local character = player.Character
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
 
--- Function to get all players
-local function getAllPlayers()
-    local players = {}
-    for _, p in pairs(game.Players:GetPlayers()) do
-        table.insert(players, p)
-    end
-    return players
-end
+-- LocalPlayer
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character
 
--- Function to get the murderer
-local function getMurderer()
-    for _, p in pairs(getAllPlayers()) do
-        if p.Character and p.Character:FindFirstChild("Murderer") then
-            return p
-        end
-    end
-    return nil
-end
+-- GUI
+local GUI = Instance.new("ScreenGui")
+GUI.Parent = game.CoreGui
 
--- Function to get the sheriff
-local function getSheriff()
-    for _, p in pairs(getAllPlayers()) do
-        if p.Character and p.Character:FindFirstChild("Sheriff") then
-            return p
-        end
-    end
-    return nil
-end
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 200)
+MainFrame.Position = UDim2.new(0, 10, 0, 10)
+MainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+MainFrame.Parent = GUI
 
--- Function to kill a player
-local function killPlayer(p)
-    if p.Character and p.Character:FindFirstChild("Humanoid") then
-        p.Character.Humanoid.Health = 0
-    end
-end
+-- Drag Bar
+local DragBar = Instance.new("Frame")
+DragBar.Size = UDim2.new(0, 300, 0, 20)
+DragBar.Position = UDim2.new(0, 0, 0, 0)
+DragBar.BackgroundColor3 = Color3.new(1, 1, 1)
+DragBar.Parent = MainFrame
 
--- Function to give a player a role
-local function giveRole(p, role)
-    if p.Character then
-        local tag = Instance.new("BoolValue")
-        tag.Name = role
-        tag.Parent = p.Character
-    end
-end
+-- Title Label
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(0, 300, 0, 20)
+TitleLabel.Position = UDim2.new(0, 0, 0, 0)
+TitleLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+TitleLabel.TextColor3 = Color3.new(0, 0, 0)
+TitleLabel.Text = "Murder Mystery 2 Hack"
+TitleLabel.FontSize = 18
+TitleLabel.Parent = DragBar
 
--- Function to teleport to a player
-local function teleportToPlayer(p)
-    if p.Character and character and character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChild("HumanoidRootPart") then
-        character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame
-    end
-end
-
--- Function to fly
-local function fly()
-    if character and character:FindFirstChild("Humanoid") then
-        character.Humanoid.WalkSpeed = 100
-        character.Humanoid.JumpPower = 100
-    end
-end
-
--- Function to ESP (Extra Sensory Perception)
+-- ESP
 local function esp()
-    for _, p in pairs(getAllPlayers()) do
-        if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-            local box = Instance.new("BoxHandleAdornment")
-            box.Size = p.Character.HumanoidRootPart.Size
-            box.Color3 = Color3.new(1, 0, 0)
-            box.Adornee = p.Character.HumanoidRootPart
-            box.Parent = p.Character.HumanoidRootPart
-        end
-    end
+for _, player in pairs(Players:GetPlayers()) do
+local character = player.Character
+if character:FindFirstChild("Murderer") then
+local espBox = Instance.new("BoxHandleAdornment")
+espBox.Size = character.HumanoidRootPart.Size
+espBox.Color3 = Color3.new(1, 0, 0) -- Red
+espBox.Parent = character.HumanoidRootPart
+elseif character:FindFirstChild("Sheriff") then
+local espBox = Instance.new("BoxHandleAdornment")
+espBox.Size = character.HumanoidRootPart.Size
+espBox.Color3 = Color3.new(0, 0, 1) -- Dark Blue
+espBox.Parent = character.HumanoidRootPart
+else
+local espBox = Instance.new("BoxHandleAdornment")
+espBox.Size = character.HumanoidRootPart.Size
+espBox.Color3 = Color3.new(0, 1, 0) -- Green
+espBox.Parent = character.HumanoidRootPart
+end
+end
 end
 
--- Function to collect items
-local function collectItems()
-    for _, item in pairs(workspace:GetDescendants()) do
-        if item.Name == "Coin" or item.Name == "Egg" then
-            firetouchinterest(item, character.HumanoidRootPart, 0)
-        end
-    end
+-- Aimbot
+local function aimbot()
+local murderer = nil
+for _, player in pairs(Players:GetPlayers()) do
+local character = player.Character
+if character:FindFirstChild("Murderer") then
+murderer = character
+end
+end
+if murderer then
+LocalPlayer.Character.HumanoidRootPart.CFrame = murderer.HumanoidRootPart.CFrame
+end
 end
 
--- Loop to run selected functions
+-- Grad Gun
+local function gradgun()
+local innocent = nil
+for _, player in pairs(Players:GetPlayers()) do
+local character = player.Character
+if not character:FindFirstChild("Murderer") and not character:FindFirstChild("Sheriff") then
+innocent = character
+end
+end
+if innocent then
+local gun = Workspace:FindFirstChild("Gun")
+if gun then
+gun.CFrame = innocent.HumanoidRootPart.CFrame
+end
+end
+end
+
+-- Main Loop
 while true do
-    -- Get the murderer and kill them
-    local murderer = getMurderer()
-    if murderer then
-        killPlayer(murderer)
-    end
-
-    -- Get the sheriff and give them the murderer role
-    local sheriff = getSheriff()
-    if sheriff then
-        giveRole(sheriff, "Murderer")
-    end
-
-    -- Teleport to a random player
-    local players = getAllPlayers()
-    if #players > 0 then
-        local randomPlayer = players[math.random(1, #players)]
-        teleportToPlayer(randomPlayer)
-    end
-
-    -- Fly
-    fly()
-
-    -- ESP
-    esp()
-
-    -- Collect items
-    collectItems()
-
-    -- Wait for a short period of time
-    wait(1)  -- Increased wait time to prevent excessive resource usage
+esp()
+aimbot()
+gradgun()
+wait(0.1)
 end
